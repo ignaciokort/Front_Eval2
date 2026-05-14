@@ -23,8 +23,8 @@ jobs:
             git clone -b deploy https://github.com/ignaciokort/Front_Eval2.git
             cd Front_Eval2
             
-            # Usamos la IP Privada del Backend que ya configuraste en los Secrets
-            echo "REACT_APP_API_URL=${{ secrets.BACKEND_URL }}" > .env
+            # Usamos la IP PRIVADA del Backend para la comunicación interna
+            echo "BACKEND_URL=${{ secrets.BACKEND_URL }}" > .env
             
             docker-compose down
             docker-compose up -d --build
