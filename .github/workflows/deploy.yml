@@ -17,17 +17,23 @@ jobs:
           username: ubuntu
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            # 1. Asegurar permisos
-            sudo chmod 666 /var/run/docker.sock
-            
-            # 2. Limpiar y clonar la rama deploy (IE4)
-            sudo rm -rf Front_Eval2
-            git clone -b deploy https://github.com/ignaciokort/Front_Eval2.git
-            cd Front_Eval2
-            
-            # 3. Crear el archivo .env
-            echo "BACKEND_URL=${{ secrets.BACKEND_URL }}" > .env
-            
-            # 4. USAR DOCKER COMPOSE SIN EL GUION (Este es el truco)
-            docker compose down
-            docker compose up -d --build
+                # 1. Asegurar permisos del socket de Docker
+                sudo chmod 666 /var/run/docker.sock
+                
+                # 2. LIMPIEZA CRÍTICA: Eliminar el contenedor viejo si existe
+                # Esto evita el error "Conflict. The container name is already in use"
+                docker stop front-container || true
+                docker rm front-container || true
+                
+                # 3. Limpiar carpeta y clonar la rama deploy (Cumpliendo IE4)
+                sudo rm -rf Front_Eval2
+                git clone -b deploy https://github.com/ignaciokort/Front_Eval2.git
+                cd Front_Eval2
+                
+                # 4. Configurar variables de entorno para Flask
+                echo "BACKEND_URL=${{ secrets.BACKEND_URL }}" > .env
+                
+                # 5. Desplegar usando Docker Compose (Cumpliendo IE2)
+                # Usamos 'docker compose' sin guion para mayor compatibilidad
+                docker compose down
+                docker compose up -d --build
