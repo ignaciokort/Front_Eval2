@@ -9,5 +9,6 @@ services:
     environment:
       - PORT=5000
       - BACKEND_URL=http://34.229.217.250:3000
+      - FLASK_BACKEND_URL=http://34.229.217.250:3000
       - SECRET_KEY=una_clave_muy_segura
     restart: always
