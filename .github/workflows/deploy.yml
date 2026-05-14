@@ -17,14 +17,17 @@ jobs:
           username: ubuntu
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            sudo apt-get update && sudo apt-get install -y docker-compose
+            # 1. Asegurar permisos
             sudo chmod 666 /var/run/docker.sock
+            
+            # 2. Limpiar y clonar la rama deploy (IE4)
             sudo rm -rf Front_Eval2
             git clone -b deploy https://github.com/ignaciokort/Front_Eval2.git
             cd Front_Eval2
             
-            # Usamos la IP PRIVADA del Backend para la comunicación interna
+            # 3. Crear el archivo .env
             echo "BACKEND_URL=${{ secrets.BACKEND_URL }}" > .env
             
-            docker-compose down
-            docker-compose up -d --build
+            # 4. USAR DOCKER COMPOSE SIN EL GUION (Este es el truco)
+            docker compose down
+            docker compose up -d --build
