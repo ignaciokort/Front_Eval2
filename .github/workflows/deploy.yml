@@ -1,7 +1,7 @@
-name: Deploy Front
+name: Deploy Frontend with Compose
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "deploy" ]
 
 jobs:
   deploy:
@@ -17,11 +17,14 @@ jobs:
           username: ubuntu
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
+            sudo apt-get update && sudo apt-get install -y docker-compose
             sudo chmod 666 /var/run/docker.sock
             sudo rm -rf Front_Eval2
-            git clone https://github.com/ignaciokort/Front_Eval2.git
+            git clone -b deploy https://github.com/ignaciokort/Front_Eval2.git
             cd Front_Eval2
-            docker build -t front-app .
-            docker stop front-container || true
-            docker rm front-container || true
-            docker run -d --name front-container -p 5000:5000 -e PORT=5000 -e BACKEND_URL=${{ secrets.BACKEND_URL }} front-app
+            
+            # Usamos la IP Privada del Backend que ya configuraste en los Secrets
+            echo "REACT_APP_API_URL=${{ secrets.BACKEND_URL }}" > .env
+            
+            docker-compose down
+            docker-compose up -d --build
